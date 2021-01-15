@@ -1,0 +1,1 @@
+Please don't tinker with settings unless you have finished the story/endings!
