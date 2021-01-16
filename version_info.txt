@@ -1,0 +1,9 @@
+Version 1.0          1/14/21
+-----------------------------
+- first release of game
+
+Version 1.1          1/16/21
+-----------------------------
+- added proper readme.md
+- fixed all known bugs
+- polished game/minor improvements

@@ -9,20 +9,21 @@ import time
 import random
 import textwrap
 
-import engine.map_layout as ml
-import engine.npc_dialogue as nd
-from engine.initiate import *
 from engine.instances import *
+from engine.initiate import *
 from engine.typewriter import *
 from engine.ending_sequence import *
+import engine.map_layout as ml
+import engine.npc_dialogue as nd
 from engine.classes import Player, PlayerInventory, PlayerGear, Weapon, Armor, Potion
 
-### STATS ###
+### GLOBALS ###
 
 
 num_moves = 0
 rooms_examined = 0
 max_examine = 1  # Had to add this due to recursion.
+# Better score: player has high health and low number of moves.
 score = (500 - my_player.hp) + num_moves
 
 
@@ -30,15 +31,18 @@ score = (500 - my_player.hp) + num_moves
 
 
 def print_score():
+    time.sleep(0.5)
     print(f"Score: {score} (lower is better)")
     print(f"Moves made: {num_moves}")
     print(f"Rooms examined: {rooms_examined}/12")
 
 
 def death_sequence():
-    type("\nY O U  A R E  D E A D\n", 0.05, 0)
-    time.sleep(1)
+    type("\nY O U  A R E  D E A D\n\n", 0.05, 0)
+    time.sleep(2)
     print_score()
+    input("\nThe game will now exit...")
+    time.sleep(1)
     sys.exit()
 
 
@@ -50,23 +54,25 @@ def check_for_trap(my_player, current_room):
     trapped = ml.room_list[current_room][ml.b_trapped]
     if trapped:
         if current_room == "c4":
-            print("\nYou've sprung a trap! A chained spiked ball is ejected at you and hits your head.")
+            type("\nYou've sprung a trap! A chained spiked ball is ejected at you and hits your head.\n\n")
             damage = roll_dice(5, 10)
             my_player.hp -= damage
-            print(f"-{damage} to hp.")
+            type(f"-{damage} to hp.\n")
+            print(f"Your health: {my_player.hp}")
 
         elif current_room == "b2":
             
-            spider_drop = """You've sprung a trap! Darts fly out from every direction towards you, piercing
+            poison_darts = """\nYou've sprung a trap! Darts fly out from every direction towards you, piercing
 you through your armor and clothes. You stagger and curse at the initial pain
 and quickly pluck out the darts. It didn't take you long to realize that from
 one of your previous adventures you've felt this feeling before--you've
 contracted scrittles.
 
-Find something that can cure you."""
+Find something that can cure you.\n"""
             
-            print(spider_drop)
-            print("Effect: -2 hp per movement.")
+            type(poison_darts)
+            print("\nEffect: -2 hp per movement.")
+            print(f"Your health: {my_player.hp}")
             my_player.status_effects = True
             my_player.disease = "scrittles"
 
@@ -97,7 +103,8 @@ def necromancer_meeting(current_room, npc, boss):
     type(ml.room_list[current_room][ml.DESC])
     input("\n\nHit 'enter' to proceed...")
     os.system("cls")
-    
+
+    get_new_name = my_player.name
     check_outcome = npc.dialogue_flow(nd.necromancer_dialogue)
     if check_outcome == 0:
         combat_sequence(boss, current_room)
@@ -122,9 +129,9 @@ def chance_meeting(current_room):
         if num == 25:  # 1 in 50 chance of chance meeting per movement.
             try:
                 if gay_rat_enemy.hp != 0:
-                    print("\nSuddenly, a giant rat comes scurrying out of a hole in the wall and stops in\n\
+                    type("\nSuddenly, a giant rat comes scurrying out of a hole in the wall and stops in\n\
 front of you. Before you take out your sword, it speaks to you in a pipsqueak\n\
-voice.")
+voice.\n")
                 time.sleep(1)
                 check_outcome = gay_rat_npc.dialogue_flow(nd.gay_rat_dialogue)
             except NameError:  # Intentionally raise this if player defeats gay rat.
@@ -180,7 +187,6 @@ def examine_room(my_player, current_room, player_inv, player_gear):
         while True:
             user_input = input("> ")
             if user_input == "pick up":
-                print("\n*Picks up*")
                 my_player.pick_up(item, player_inv, player_gear)
                 item_list.remove(item)
                 examine_room(my_player, current_room, player_inv, player_gear)
@@ -220,11 +226,14 @@ def examine_room(my_player, current_room, player_inv, player_gear):
 
 def first_move(enemy):
     """Returns if player goes first; if enemy is first, does an attack then returns"""
+
+    os.system("cls")
+
     if roll_dice(1, 2) == 1:  # Player goes first.
-        print("\nYou go first!")
+        type("\nYou go first!\n")
         return
     else:  # Enemy goes first.
-        print(f"\n{enemy.name.title()} goes first!")
+        type(f"\n{enemy.name.title()} goes first!\n")
         enemy.attack(my_player)
         return
 
@@ -242,11 +251,13 @@ def combat_sequence(enemy, current_room):
     def check_death(enemy, my_player):
         if enemy.hp <= 0:
             print()
+            time.sleep(1)
             type(textwrap.fill(enemy.death_desc, 80))
             print()
             time.sleep(1)
-            print(f"\nThe {enemy.name} has been slain!")
-            print(f"Your remaining health: {my_player.hp}")
+            type(f"\nThe {enemy.name} has been slain!\n")
+            type(f"Your remaining HP: {my_player.hp}\n", 0.04, 0.04)
+            time.sleep(0.5)
             return True
         elif my_player.hp <= 0:
             death_sequence()
@@ -262,6 +273,7 @@ def combat_sequence(enemy, current_room):
 
         if user_input in command_list:
             if user_input == "attack":
+                os.system("cls")
                 my_player.attack(enemy)
                 # True = enemy slain.
                 if check_death(enemy, my_player) == True:
@@ -270,14 +282,14 @@ def combat_sequence(enemy, current_room):
                     aurels_dropped = enemy.aurels
                     if aurels_dropped > 0:
                         my_player.aurels += aurels_dropped
-                        print(f"\nYou picked up {aurels_dropped} aurels.")
-                        time.sleep(1)
+                        type(f"\nYou picked up {aurels_dropped} aurels.\n")
+                        time.sleep(0.5)
                     # Give player xp after enemy defeat.
                     xp_dropped = enemy.xp_drop
                     if xp_dropped > 0:
                         my_player.xp += xp_dropped
-                        print(f"\nYou absorbed {xp_dropped} xp from the battle.")
-                        time.sleep(1)
+                        type(f"\nYou absorbed {xp_dropped} xp from the battle.\n")
+                        time.sleep(0.5)
 
                     input("\nPress 'enter' to continue...")
                     os.system("cls")
@@ -294,15 +306,15 @@ def combat_sequence(enemy, current_room):
                 # If enemy attribute allows player to flee from battle and if also passes flee check.
                 if flee is True and enemy.player_can_flee is True:
                     ml.room_list[current_room][ml.met_enemy] = True
-                    print("\nFlee successful!")
-                    time.sleep(1)
+                    type("\nFlee successful!\n")
+                    time.sleep(0.5)
                     os.system("cls")
                     return False
                 elif not enemy.player_can_flee:  # If enemy attribute doesn't allow fleeing (final boss).
-                    print("\nYou may not flee from this enemy!")
+                    type("\nYou may not flee from this enemy!\n")
                 else:
-                    print("\nFlee unsuccessful!")  # Flee check not passed.
-                    time.sleep(1)
+                    type("\nFlee unsuccessful!\n")  # Flee check not passed.
+                    time.sleep(0.5)
                     enemy.attack(my_player)
 
             elif user_input == "inventory":
@@ -339,22 +351,22 @@ def move_direction(current_room, DIRECTION):
     elif ml.room_list[next_room][ml.locked]:  # If room is locked.
         # Key check to unlock storage room.
         if ml.room_list[next_room][ml.ROOM_NAME] == "storage room" and ml.storage_key not in player_inv.items:
-            print("\nYou turn the knob and notice that it's locked. Maybe there's a key?")
+            type("\nYou turn the knob and notice that it's locked. Maybe there's a key?\n")
             return current_room
         elif ml.room_list[next_room][ml.ROOM_NAME] == "storage room" and ml.storage_key in player_inv.items:
             num_moves += 1
-            print("\nYou use the small key that you found to unlock the door.")
+            type("\nYou use the small key that you found to unlock the door.\n")
 
         # Key check to unlock laboratory room.
         if ml.room_list[next_room][ml.ROOM_NAME] == "spells and alchemy lab" and ml.storage_key in player_inv.items and ml.lab_key not in player_inv.items:
-            print("\nYou try to use the small key but it doesn't fit the lock.")
+            type("\nYou try to use the small key but it doesn't fit the lock.\n")
             return current_room
         elif ml.room_list[next_room][ml.ROOM_NAME] == "spells and alchemy lab" and ml.lab_key not in player_inv.items:
-            print("\nYou turn the knob and notice that it's locked. Maybe there's a key?")
+            type("\nYou turn the knob and notice that it's locked. Maybe there's a key?\n")
             return current_room
         elif ml.room_list[next_room][ml.ROOM_NAME] == "spells and alchemy lab" and ml.lab_key in player_inv.items:
             num_moves += 1
-            print("\nYou use the large key that you found to unlock the door.")
+            type("\nYou use the large key that you found to unlock the door.\n")
 
         ml.room_list[next_room][ml.locked] = False  # No longer need to unlock door key.
         current_room = next_room
@@ -370,7 +382,7 @@ def move_direction(current_room, DIRECTION):
         my_player.hp = round(my_player.hp - 2.00, 2)
         print("\nScrittles inflicts. You lost 2 hp.")
         if my_player.hp <= 0:
-            print("\nYou have succumbed to Scrittles.")
+            type("\nYou have succumbed to Scrittles.\n")
             death_sequence()
 
     return current_room
@@ -416,11 +428,12 @@ def dungeon_loop():
             if ml.room_list[current_room][ml.met_enemy] is False:  # If player has never met enemy.
                 print()
                 type(textwrap.fill(room_enemy.intro_desc, 80))
-                print("\n\nYou unsheath your sword and prepare for combat")
+                type("\n\nYou unsheath your sword and prepare for combat\n")
             else:  # If player returns back to fighting enemy after fleeing.
-                print(f"\n\nYou come back to face the {room_enemy.name}.")
+                type(f"\nYou come back to face the {room_enemy.name}.\n")
 
             # Initiate combat with player.
+            time.sleep(1)
             input("\nPress 'enter' to continue...")
             os.system("cls")
             combat_outcome = combat_sequence(room_enemy, current_room)  # combat_outcome - False: fleed battle (back to previous room), True: slain enemy.
@@ -445,7 +458,7 @@ def dungeon_loop():
         user_input = input("> ").lower().strip()
 
         if user_input == "quit":  # Exits out of the game.
-            print("\nAre you sure you want to quit the game? (Y/N)")
+            type("\nAre you sure you want to quit the game? (Y/N)\n")
             print_score()
             while True:
                 answer = input("> ").lower().strip()
@@ -488,9 +501,11 @@ def dungeon_loop():
                 prev_room = current_room
                 current_room = move_direction(current_room, ml.room_list[current_room][ml.WEST])
 
-            elif user_input == "monkey":
+            elif user_input == "monkey":  # No easter eggs here! :D
                 os.system("cls")
-                print("\nOOH OOOH AH AHH")
+                type("\nOOH OOOH AH AHH\n")
+                sleep(1.5)
+                os.system("cls")
 
         else:
             os.system("cls")
@@ -501,7 +516,7 @@ def main():
     # Equipping player items before entering lair.
     player_gear.equip(my_player, footman_sword, True)
     player_gear.equip(my_player, padded_armor, True)
-    my_player.pick_up(small_health_potion, player_inv, player_gear)
+    my_player.pick_up(small_health_potion, player_inv, player_gear, True)
 
     os.system("cls")
 
@@ -515,8 +530,10 @@ def main():
         ending_sequence(2)
     
     os.system("cls")
-    print("\nThanks for playing!")
+    print("\nThanks for playing!\n")
+    time.sleep(1)
     print_score()
-    input()
+    time.sleep(2)
+    input("\nThe game will now exit...")
     
     return

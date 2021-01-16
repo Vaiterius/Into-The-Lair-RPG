@@ -121,14 +121,14 @@ guild for which you'd be rewarded influence points and special items.
 
 There is a door to the north and the large door you came from to the south."""
 
-     
+#------------------------------------------------------------------------------#
 MASTER_CHAMBER_DESC = """You open the door to reveal... nothing? Two dim, blue flames light up on the
 other side of the room but not bright enough to reveal anything else. You step
 in to investigate and the door behind you suddenly slams shut as the entire room
-is lit up torch by torch all cross the sides of the walls. You spot the figure
-responsible for the sudden performance ahead of you in night black robes with
-both arms raised to hold the two blue flames you saw on the palms of his hand,
-his menacing grin directed at you."""
+is lit up torch by torch all along the walls. You spot the figure responsible
+for the sudden performance ahead of you in night black robes with both arms
+raised to hold the two blue flames you saw on the palms of his hand, his
+menacing grin directed at you."""
 
 
 SHRINE_ROOM_DESC = """You are in what looks to be a shrine room as in front of
@@ -449,12 +449,14 @@ config.read(ini_file)
 disable_enemies = config.getboolean("Other", "disable_enemies")
 disable_traps = config.getboolean("Other", "disable_traps")
 
-# Disables enemies if True in config
+# Disables enemies if True in config,
+# also doesn't get rid of necromancer.
 if disable_enemies is True:
     for room, dict in room_list.items():
         for name, value in dict.items():
-            dict[enemy] = None
-            dict[has_enemy] = False
+            if dict[enemy] != necromancer:
+                dict[enemy] = None
+                dict[has_enemy] = False
             dict[hotspot] = False
     print("Disabled enemies")
 

@@ -8,7 +8,6 @@ import textwrap
 from time import sleep
 from random import randint, uniform
 
-
 from engine.typewriter import *
 
 class Player:
@@ -26,7 +25,7 @@ class Player:
         self.crit_chance = crit_chance
         self.crit_dmg = crit_dmg
         self.start_room = start_room
-        self.aurels = 0
+        self.aurels = 1240
         self.hit_reduct = 0
         self.status_effects = False
         self.disease = None
@@ -55,15 +54,15 @@ class Player:
         print(f"Damage given: {damage}")
         if target.hp <= 0:
             target.hp = 0
-        print(f"Enemy health: {target.hp}")
+        print(f"Enemy HP: {target.hp}")
 
         return
 
     def flee(self, enemy: object) -> bool:
         """Returns True if successfully flees, False if not"""
 
-        print("\nYou attempt to flee...")
-        sleep(1)
+        type("\nYou attempt to flee...\n")
+        sleep(0.5)
         check_roll = randint(1, 2)  # 50% chance to flee.
         if check_roll == 1:
             return True
@@ -85,13 +84,13 @@ class Player:
 
             # Display available stats to increase per level up.
             type(f"\nLevel up!\n")
-            print("\nNew level: {self.lvl}\nXP to next level: {self.next_lvl}")
-            print("Choose one stat to increase (enter number):")
-            print(f"\t1) +5 to max hp (current: {self.max_hp})")
-            print(f"\t2) +0.2 to base damage (current: {self.dmg[0]}-{self.dmg[1]})")
-            print(f"\t3) +2% chance to crit (current: {self.crit_chance}%)")
-            print(f"\t4) +0.02 to crit damage (current: {self.crit_dmg})")
+            print(f"\nNew level: {self.lvl}\nXP to next level: {self.next_lvl}\n")
+            print(f"1) +5.0 to max HP (current: {self.max_hp})")
+            print(f"2) +0.2 to base damage (current: {self.dmg[0]}-{self.dmg[1]})")
+            print(f"3) +2% chance to crit (current: {self.crit_chance}%)")
+            print(f"4) +0.02 to crit damage (current: +{self.crit_dmg}% dmg if crit)")
 
+            print("Choose one stat to increase (enter number):")
             while True:  # Loop for user choice.
                 try:
                     chosen_stat = int(input("> ").strip())
@@ -100,14 +99,19 @@ class Player:
                         print("\nNot in list!")
                     else:
                         if chosen_stat == 1:
+                            type(f"\nYour HP: {self.hp} -> {self.hp + 5.0}", 0.04, 0.04)
                             self.hp += 5
                         elif chosen_stat == 2:
+                            type(f"\nYour damage: {self.dmg[0]}-{self.dmg[1]} -> {self.dmg[0] + 0.2}-{self.dmg[1] + 0.2 }", 0.04, 0.04)
                             self.dmg[0] = round(self.dmg[0] + 0.20, 2)
                             self.dmg[1] = round(self.dmg[1] + 0.20, 2)
                         elif chosen_stat == 3:
+                            type(f"\nYour crit chance: {self.crit_chance}% -> {self.crit_chance + 2}%", 0.04, 0.04)
                             self.crit_chance += 2
                         elif chosen_stat == 4:
+                            type(f"\nYour crit damange: +{self.crit_dmg}% -> +{self.crit_dmg + 0.02}%", 0.04, 0.04)
                             self.crit_dmg += 0.02
+                        input("\n\nPress 'enter' to continue...")
                         break
                 except ValueError:  # Only int values are allowed.
                     print("\nEnter only numbers!")
@@ -162,16 +166,21 @@ class Player:
         input("\nPress enter to continue...")
         os.system("cls")
 
-    def pick_up(self, item: object, player_inv: object, player_gear: object) -> None:
+    def pick_up(self, item: object, player_inv: object, player_gear: object, initializing=False) -> None:
         """Sends item to inventory or gear to gear inventory"""
 
-        try:  # Invetory.
+        try:  # Gear inventory.
             item.gear_type
             player_gear.gear_dict[item] = False
-            print(f"{item.name.title()} has been added to your gear inventory.")
-        except AttributeError:  # Gear inventory.
+            if initializing is False:
+                type(f"\n{item.name.title()} has been added to your gear.\n", 0.03)
+                sleep(0.5)
+        except AttributeError:  # Inventory.
             player_inv.items.append(item)
-            print(f"{item.name.title()} has been added to your inventory.")
+            if initializing is False:
+                type(f"\n{item.name.title()} has been added to your inventory.\n", 0.03)
+                sleep(0.5)
+        return
 
 class PlayerGear:
     def __init__(self):
@@ -276,7 +285,7 @@ class PlayerGear:
                 break
 
             elif user_input == "drop":
-                self.drop(my_player, gear)
+                self.drop(my_player, gear, gear_equipped)
                 self.view_gear(my_player)
                 break
 
@@ -285,8 +294,8 @@ class PlayerGear:
                 if gear.name == "soulforged breastplate of the damned" and not my_player.has_dlc:
                     print("\nYou must purchase DLC in order to wear this!")
                     continue
-                elif gear.name == "soulforged breastplate of the damned" and my_player.lvl != 100:
-                    print("\nYou must be level 100 to equip!")
+                elif gear.name == "soulforged breastplate of the damned" and my_player.lvl != 50:
+                    print("\nYou must be level 50 to equip!")
                     continue
                 elif gear_equipped is True:
                     print("You cannot equip what's already equipped.")
@@ -408,22 +417,23 @@ class PlayerGear:
         else:
             sleep(1)
 
-    def drop(self, my_player: object, gear: object) -> None:
+    def drop(self, my_player: object, gear: object, gear_equipped: bool) -> None:
         """Takes out object from gearventory and deletes it"""
 
         print("\nWarning: Dropped gear and items cannot be retrieved back. Proceed? (Y/N)")
         while True:  # Loop for player response.
             user_input = input("> ").lower().strip()
             if user_input == "y":
-                self.unequip(my_player, gear)
-                print("You discard it to the ground, unneeded by you.")
+                if gear_equipped is True:
+                    self.unequip(my_player, gear)
                 del self.gear_dict[gear]
                 sleep(1)
+            elif user_input == "n":
                 return
             else:
-                print("\nYou decide not to throw out your gear")
-                sleep(1)
-                return
+                print("\nInvalid input.")
+                continue
+            return
 
 
 class PlayerInventory:
@@ -457,7 +467,8 @@ class PlayerInventory:
                     user_num = int(input("> ").lower().strip())
 
                     if user_num == len(self.items)+1:
-                        print("Closing inventory...")
+                        print("\nClosing inventory...")
+                        sleep(1)
                         os.system("cls")
                         return False
                     elif user_num not in range(1, len(self.items)+1):
@@ -489,6 +500,9 @@ class PlayerInventory:
                     self.drop(item, user_num, True)  # Player consumes.
                     break
                 elif user_input == "drop":
+                    if item.quest_item is True:
+                        print("\nYou may not drop quest items")
+                        continue
                     self.drop(item, user_num, False)
                     self.view_inventory(my_player)
                     break
@@ -558,7 +572,7 @@ class Enemy:
         print(f"Damage received: {actual_damage}")
         if target.hp <= 0:
             target.hp = 0
-        print(f"Your health: {target.hp}")
+        print(f"Your HP: {target.hp}")
 
         return
 
@@ -605,6 +619,7 @@ class NPC:
                 break
 
             # Display dialogue.
+            os.system("cls")
             print(f"\n{self.name.title()}:")
             type(f"{page['text']}\n")
             sleep(1)
@@ -648,11 +663,12 @@ class Armor:
 
 class Potion:
     def __init__(self, name: str, desc: str,
-                 worth: int, hp_add=0, effect=None):
+                 worth: int, hp_add=0, quest_item=False, effect=None):
         self.name = name
         self.desc = desc
         self.worth = worth
         self.hp_add = hp_add
+        self.quest_item = quest_item
         self.effect = effect
 
     def use(self, item: object, my_player: object) -> bool:
@@ -662,43 +678,58 @@ class Potion:
 
         os.system("cls")
 
+        print()
         if self.name == "cure disease potion":
-            type(textwrap.fill("\nYou drink up the potion, heaving at its repulsive taste. However, you start to feel your disease slip away by the second.\n", 80))
-            type(f"{my_player.disease.title()} removed.")
+            type(textwrap.fill("\nYou drink up the potion, heaving at its repulsive taste. You start to feel your disease slip away by the second.\n", 80))
+            type(f"\n\n{my_player.disease.title()} removed.", 0.04, 0.75)
             my_player.disease = None
+            my_player.status_effects = False
 
         if my_player.hp >= my_player.max_hp:
-            type("\nYour health is already full!\n")
+            type("Your health is already full!\n")
             return False  # Player doesn't drink potion.
+
         elif self.name == "small health potion":
-            type(textwrap.fill("\nYou slurp up the vial and feel a noticeable but pleasant jolt throughout your body.\n", 2))
+            prev_hp = my_player.hp
             my_player.hp += self.hp_add
             if my_player.hp > my_player.max_hp:
                 my_player.hp = my_player.max_hp
+            print(f"Your HP: {prev_hp} -> {my_player.hp}\n")
+            type(textwrap.fill("\nYou slurp up the vial and feel a noticeable but pleasant jolt.\n", 80))
+
         elif self.name == "medium health potion":
-            type(textwrap.fill("\nYou pour the contents of the potion down your throat and feel a slight surge of energy throughout your body.\n", 2))
+            prev_hp = my_player.hp
             my_player.hp += self.hp_add
             if my_player.hp > my_player.max_hp:
                 my_player.hp = my_player.max_hp
+            print(f"Your HP: {prev_hp} -> {my_player.hp}\n")
+            type(textwrap.fill("\nYou pour the contents down your throat and feel a slight surge of energy.\n", 80))
+
         elif self.name == "large health potion":
-            type(textwrap.fill("\nYou chug the potion all the way down and a burst of refreshing life surges throughout your body.\n", 2))
+            prev_hp = my_player.hp
             my_player.hp += self.hp_add
             if my_player.hp > my_player.max_hp:
                 my_player.hp = my_player.max_hp
+            print(f"Your HP: {prev_hp} -> {my_player.hp}\n")
+            type(textwrap.fill("\nYou chug the potion all the way down and feel a burst of refreshing life.\n", 80))
+
+        input("\n\nPress 'enter' to continue...")
+        os.system("cls")
 
         return True  # Let game know that player drank potion, for combat purposes.
 
 
 class MiscItem:
-    def __init__(self, name: str, desc: str, worth: int):
+    def __init__(self, name: str, desc: str, worth: int, quest_item: bool):
         self.name = name
         self.desc = desc
         self.worth = worth
+        self.quest_item = quest_item
 
     def use(self, item: object, my_player:object) -> bool:
         """ Returns False.
         More like to show usage.
         """
-
-        print("\nTo use, go towards the locked door you wish to open.")
+        if item.name == "large key" or item.name == "small key":
+            print("\nTo use, go towards the locked door you wish to open.")
         return False

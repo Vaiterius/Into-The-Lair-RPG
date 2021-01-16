@@ -4,10 +4,10 @@ Dialogue text with with player responses.
 - rat
 """
 
+from engine.initiate import player_name
+
 # 80 characters for reference:
 #------------------------------------------------------------------------------#
-
-from engine.instances import my_player
 
 necromancer_dialogue = {
     1: {
@@ -18,10 +18,9 @@ to die here or do you wish to be the test subject for my new experiment? It will
 be painful either way!""",
 
         "options": [
-            (f"My name is {my_player.name}. I've heard of your exploits against the people of\n\
+            (f"My name is {player_name}. I've heard of your exploits against the people of\n\
    Stennerden and I've come to bring justice. Duel me, necromancer!", 2),
-            ("I don't care for chat, I will be the last thing you will ever see! (fight)", 21),
-            ("SKIP TO 17.", 17)
+            ("I don't care for chat, I will be the last thing you will ever see! (fight)", 21)
             ]
         },
     2: {
@@ -221,7 +220,7 @@ ever reward you. I have a plan for you.""",
 determination, your fearlessness. And perhaps your loyalty... You would make a
 valuable asset. I will show you a new way of life, powers you never could have
 dreamt...""",
-              ################################################################################
+
         "options": [
             ("You are right with your words. You were wronged and you deserve more with my\n\
    help. I accept your proposal. (end convo)", 18),
@@ -233,14 +232,14 @@ dreamt...""",
         },
     17: {
         "text":
-f"*Sigh*... Perhaps you may have misunderstood me. {my_player.name},\n\
-this world in all its cruelness, where people can be moreso cruel than even\n\
-monsters, is not to be treaded so heedlessly. To this, one must be\n\
-opportunistic. Take advantage so that you may rise against those who oppose you.\n\
-I can see it inside you, orphaned before you could even talk, you are alone in\n\
-this world. Off to fend for yourself at an early age, you only had yourself to\n\
-take care of. I can offer you a true home here. And together, I will give you a\n\
-purpose. Join me.",
+################################################################################
+f"*Sigh*... Perhaps you may have misunderstood me. {player_name}, this world\n\
+in all its cruelness, where people can be moreso cruel than even monsters, is\n\
+not to be treaded so heedlessly. To this, one must be opportunistic. Take\n\
+advantage so that you may rise against those who oppose you. I can see it in\n\
+you, orphaned before you could even talk, you are alone in this world. Off to\n\
+fend for yourself at an early age, you only had yourself to take care of. I can\n\
+offer you a true home here. And together, I will give you a purpose. Join me.",
 
         "options": [
             ("I stand by my principles. You are an ill and disturbed old man and your\n\
@@ -291,7 +290,7 @@ gay_rat_dialogue = {
         "text": "Greetings, I'm Gil the gay rat. And who are you? :3",
         "options": [
             ("Wait, you're a talking rat? How?", 2),
-            (f"My name is {my_player.name}, what are you doing here?", 3),
+            (f"My name is {player_name}, what are you doing here?", 3),
             ("Wait, you're gay? I must slay you! (fight)", 6),
             ]
         },
