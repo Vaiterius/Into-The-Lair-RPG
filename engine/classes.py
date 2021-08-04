@@ -201,10 +201,8 @@ class PlayerGear:
 
         os.system("cls")
 
-        # No gear and goes back.
         if not self.weapon and not self.head and not self.body and not self.feet and not self.hands:
-            type("\nYou realize that you have nothing equipped! Not even a weapon!\n")
-            return
+            type("\nYour have nothing equipped.\n")
 
         # Gear slots and attached gear if any.
         name = "None" if not self.weapon else self.weapon.name
@@ -450,7 +448,7 @@ class PlayerInventory:
         performed = None
         if not self.items:  # Nothing in inventory.
             print(f"\nAurels: {my_player.aurels}")
-            type("Your inventory is empty!\n")
+            type("Your inventory is empty.\n")
             sleep(0.5)
         else:  # If stuff in inventory.
             os.system("cls")

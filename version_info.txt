@@ -7,3 +7,10 @@ Version 1.1          1/16/21
 - added proper readme.md
 - fixed all known bugs
 - polished game/minor improvements
+
+Version 1.2          8/4/21
+-----------------------------
+- fixed a couple bugs that i completely forgot about
+- edited commands to be more convenient
+- i don't know why i came back to this,
+  this is probably my last commit

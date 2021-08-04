@@ -23,15 +23,16 @@ from engine.classes import Player, PlayerInventory, PlayerGear, Weapon, Armor, P
 num_moves = 0
 rooms_examined = 0
 max_examine = 1  # Had to add this due to recursion.
-# Better score: player has high health and low number of moves.
-score = (500 - my_player.hp) + num_moves
 
 
 ### INTERACTIVITY ###
 
 
 def print_score():
+    """Better score: player has high health and low number of moves."""
+    score = (500 - my_player.hp) + num_moves - rooms_examined
     time.sleep(0.5)
+    print("Finishing the game with high health, all rooms examined,\nand lower number of moves results in a better score.")
     print(f"Score: {score} (lower is better)")
     print(f"Moves made: {num_moves}")
     print(f"Rooms examined: {rooms_examined}/12")
@@ -469,39 +470,39 @@ def dungeon_loop():
                     break
         elif user_input in command_list or user_input == "monkey":
 
-            if user_input == "help":
+            if user_input in ["help", "h"]:
                 os.system("cls")
                 print(f"\nAvailable choices:\n{', '.join(command_list)}")
 
-            elif user_input == "examine":
+            elif user_input in ["examine", "inspect", "ex"]:
                 examine_room(my_player, current_room, player_inv, player_gear)
 
-            elif user_input == "stats":
+            elif user_input in ["stats", "s"]:
                 my_player.check_stats()
 
-            elif user_input == "inventory":
+            elif user_input in ["inventory", "inv", "i"]:
                 player_inv.view_inventory(my_player)
 
-            elif user_input == "gear":
+            elif user_input in ["gear", "g"]:
                 player_gear.view_gear(my_player)
 
-            elif user_input == "go north":
+            elif user_input in ["go north", "north", "n", "up"]:
                 prev_room = current_room
                 current_room = move_direction(current_room, ml.room_list[current_room][ml.NORTH])
 
-            elif user_input == "go east":
+            elif user_input in ["go east", "east", "e", "right"]:
                 prev_room = current_room
                 current_room = move_direction(current_room, ml.room_list[current_room][ml.EAST])
 
-            elif user_input == "go south":
+            elif user_input in ["go south", "south", "s", "down"]:
                 prev_room = current_room
                 current_room = move_direction(current_room, ml.room_list[current_room][ml.SOUTH])
 
-            elif user_input == "go west":
+            elif user_input in ["go west", "west", "w", "left"]:
                 prev_room = current_room
                 current_room = move_direction(current_room, ml.room_list[current_room][ml.WEST])
 
-            elif user_input == "monkey":  # No easter eggs here! :D
+            elif user_input in ["monkey", "monke"]:  # No easter eggs here! :D
                 os.system("cls")
                 type("\nOOH OOOH AH AHH\n")
                 sleep(1.5)

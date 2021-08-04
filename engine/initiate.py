@@ -22,7 +22,7 @@ type("/\/ /_ | | | | || (_) |  / /  | | | |  __/ / /__| (_| | | |\n", 0.01)
 type("\____/ |_| |_|\__\___/   \/   |_| |_|\___| \____/\__,_|_|_|\n", 0.01, 0.0)
 
 sleep(1)
-type("\nA roguelike, text-based RPG", 0.04, 0.1)
+type("\nA text-based, dungeon RPG", 0.04, 0.1)
 sleep(1)
 type("\n\nHave fun!\n\nStart game? (Y/N)\n")
 
