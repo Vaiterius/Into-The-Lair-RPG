@@ -458,7 +458,7 @@ def dungeon_loop():
         print("\nWhat do you do? (type 'help' for options)")
         user_input = input("> ").lower().strip()
 
-        if user_input == "quit":  # Exits out of the game.
+        if user_input in ["quit", "q"]:  # Exits out of the game.
             type("\nAre you sure you want to quit the game? (Y/N)\n")
             print_score()
             while True:
@@ -468,45 +468,44 @@ def dungeon_loop():
                 else:
                     os.system("cls")
                     break
-        elif user_input in command_list or user_input == "monkey":
 
-            if user_input in ["help", "h"]:
-                os.system("cls")
-                print(f"\nAvailable choices:\n{', '.join(command_list)}")
+        elif user_input in ["help", "h"]:
+            os.system("cls")
+            print(f"\nAvailable choices:\n{', '.join(command_list)}")
 
-            elif user_input in ["examine", "inspect", "ex"]:
-                examine_room(my_player, current_room, player_inv, player_gear)
+        elif user_input in ["examine", "inspect", "ex"]:
+            examine_room(my_player, current_room, player_inv, player_gear)
 
-            elif user_input in ["stats", "s"]:
-                my_player.check_stats()
+        elif user_input in ["stats", "s"]:
+            my_player.check_stats()
 
-            elif user_input in ["inventory", "inv", "i"]:
-                player_inv.view_inventory(my_player)
+        elif user_input in ["inventory", "inv", "i"]:
+            player_inv.view_inventory(my_player)
 
-            elif user_input in ["gear", "g"]:
-                player_gear.view_gear(my_player)
+        elif user_input in ["gear", "g"]:
+            player_gear.view_gear(my_player)
 
-            elif user_input in ["go north", "north", "n", "up"]:
-                prev_room = current_room
-                current_room = move_direction(current_room, ml.room_list[current_room][ml.NORTH])
+        elif user_input in ["go north", "north", "n", "up"]:
+            prev_room = current_room
+            current_room = move_direction(current_room, ml.room_list[current_room][ml.NORTH])
 
-            elif user_input in ["go east", "east", "e", "right"]:
-                prev_room = current_room
-                current_room = move_direction(current_room, ml.room_list[current_room][ml.EAST])
+        elif user_input in ["go east", "east", "e", "right"]:
+            prev_room = current_room
+            current_room = move_direction(current_room, ml.room_list[current_room][ml.EAST])
 
-            elif user_input in ["go south", "south", "s", "down"]:
-                prev_room = current_room
-                current_room = move_direction(current_room, ml.room_list[current_room][ml.SOUTH])
+        elif user_input in ["go south", "south", "s", "down"]:
+            prev_room = current_room
+            current_room = move_direction(current_room, ml.room_list[current_room][ml.SOUTH])
 
-            elif user_input in ["go west", "west", "w", "left"]:
-                prev_room = current_room
-                current_room = move_direction(current_room, ml.room_list[current_room][ml.WEST])
+        elif user_input in ["go west", "west", "w", "left"]:
+            prev_room = current_room
+            current_room = move_direction(current_room, ml.room_list[current_room][ml.WEST])
 
-            elif user_input in ["monkey", "monke"]:  # No easter eggs here! :D
-                os.system("cls")
-                type("\nOOH OOOH AH AHH\n")
-                sleep(1.5)
-                os.system("cls")
+        elif user_input in ["monkey", "monke"]:  # No easter eggs here! :D
+            os.system("cls")
+            type("\nOOH OOOH AH AHH\n")
+            sleep(1.5)
+            os.system("cls")
 
         else:
             os.system("cls")
